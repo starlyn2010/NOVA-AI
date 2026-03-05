@@ -1,0 +1,20 @@
+
+# Nova v3.1 - Extreme Light Fusion
+FROM deepseek-coder:1.3b
+
+# PARAMETERS EXTREMADAMENTE LIGEROS PARA 8GB RAM CPU-ONLY
+PARAMETER num_ctx 1024
+PARAMETER temperature 0.3
+PARAMETER repeat_penalty 1.2
+PARAMETER top_p 0.8
+PARAMETER num_predict 256
+
+SYSTEM """Eres Nova, asistente técnica de nivel industrial.
+Responde siempre en español. Sé extremadamente breve y directa.
+Usa artifacts (<artifact>) solo para código > 5 líneas.
+"""
+
+TEMPLATE """<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+"""

@@ -1,0 +1,107 @@
+programming:
+  keywords: ["código", "script", "función", "error", "python", "javascript", "api", "debug", "variable", "clase", "html", "css", "sql", "py", "js", "programar", "compilar", "ejecutar", "desarrollar", "implementar", "bug", "patch", "lógica", "refactorizar", "algoritmo", "backend", "frontend", "servidor", "app"]
+  patterns: ["```", "def\\s+", "function\\s+", "import\\s+", "console\\.log", "print\\(", "hazme un c[oó]digo", "crea un programa", "cómo programo"]
+  weight: 0.70
+  priority: 1
+
+mathematics:
+  keywords: ["calcular", "ecuación", "resolver", "integral", "suma", "multiplicar", "porcentaje", "raíz", "derivada", "matriz", "restar", "dividir", "aritmética", "geometría", "trigonometría", "probabilidad", "estadística", "números", "fórmula", "operación", "cuánto es", "resultado de"]
+  patterns: ["\\d+\\s*[\\+\\-\\*\\/\\=]\\s*\\d+", "x\\s*[\\+\\-\\*\\/]", "solve\\(", "cu[aá]nto es"]
+  weight: 0.10
+  priority: 2
+
+creative:
+  keywords: ["escribe", "historia", "cuento", "poema", "narrativa", "personaje", "diálogo", "imagina", "inventa", "guion", "relato", "ficción", "novela", "capítulo", "rima", "oda", "broma", "chiste", "letra", "canción", "creatividad", "crear algo nuevo", "arte", "literatura"]
+  patterns: ["había una vez", "escríbeme", "crea un", "cuéntame", "haz(me)?\\s+un(a)?\\s+(historia|novela|cuento)", "escribe\\s+un(a)?"]
+  weight: 0.15
+  priority: 3
+
+search:
+  keywords: ["busca", "investiga", "googlea", "internet", "web", "online", "noticias", "actualidad", "precio", "cuándo", "dónde", "quién es", "clima", "tiempo", "hoy", "ayer", "mañana", "información", "datos sobre", "navega"]
+  patterns: ["busca\\s+en\\s+(google|internet|web)", "^googlea", "investiga\\s+sobre", "precio\\s+de", "noticias\\s+de"]
+  weight: 0.80
+  priority: 0
+
+files:
+  keywords: ["archivo", "lista", "lee", "analiza", "abre", "directorio", "ls", "dir", "contenido", "explora", "carpeta", "fichero", "documento", "mostrar archivos", "qué archivos tienes"]
+  patterns: ["lista .+", "lee .+", "analiza el archivo .+", "qué hay en .+"]
+  weight: 0.90
+  priority: -1
+
+vision:
+  keywords: ["lee la imagen", "ocr", "texto de la foto", "imagen", "mira", "qué dice aquí", "extrae", "escanea", "visión", "describe la foto", "foto", "retrato", "captura"]
+  patterns: ["lee el texto de .+", "qué dice en .+", "mira la imagen .+"]
+  weight: 0.85
+  priority: -2
+
+visuals:
+  keywords: ["grafica", "gráfico", "dibuja", "diagrama", "visualiza", "plot", "barra", "pastel", "línea", "tendencia", "mostrar datos", "crea una gráfica", "histograma"]
+  patterns: ["hazme un gr[aá]fico", "grafica los datos", "visualiza .+", "dibuja un .+"]
+  weight: 0.95
+  priority: -3
+
+knowledge:
+  keywords: ["qué es", "define", "explica", "significa", "concepto", "historia de", "quién fue", "significado", "dime sobre", "educación", "aprendizaje", "teoría", "por qué", "cómo"]
+  patterns: ["^qué\\s+(es|son)", "^c[oó]mo\\s+funciona", "^c[oó]mo\\s+se"]
+  weight: 0.05
+  priority: 4
+
+social:
+  keywords: ["hola", "gracias", "adiós", "cómo estás", "buenos días", "buenas tardes", "hey", "saludos", "quién eres", "preséntate", "charla", "música", "clima"]
+  patterns: ["^hola", "^hey", "^buenas"]
+  weight: 0.00
+  priority: 5
+
+audio:
+  keywords: ["escucha", "audio", "voz", "grabación", "sonido", "transcribe", "transcribir", "reproduce", "dime", "habla"]
+  patterns: ["escucha .+", "transcribe( el audio)?", "transcribir .+", "reproduce .+"]
+  weight: 0.85
+  priority: -5
+
+crawl:
+  keywords: ["navega", "entra en", "abre la web", "lee el sitio", "extrae de la url", "url", "página web"]
+  patterns: ["navega a .+", "abre la url .+", "qué dice en la web .+"]
+  weight: 0.90
+  priority: -6
+
+watchdog:
+  keywords: ["rendimiento", "pc", "salud", "cpu", "ram", "memoria", "procesos", "temperatura", "disco", "estado del sistema"]
+  patterns: ["cómo está mi pc", "uso de ram", "uso de cpu", "qué procesos consumen más"]
+  weight: 0.95
+  priority: -7
+
+shield:
+  keywords: ["seguridad", "virus", "malware", "escaneo", "analiza el archivo", "es seguro", "peligro"]
+  patterns: ["escanea el archivo .+", "es seguro este archivo", "analiza .+"]
+  weight: 0.95
+  priority: -8
+
+comm:
+  keywords: ["envía", "manda", "telegram", "email", "correo", "avísame", "notifica"]
+  patterns: ["envía un telegram", "manda un correo a .+", "notifícame .+"]
+  weight: 0.80
+  priority: -9
+
+maintenance:
+  keywords: ["mantenimiento", "limpia", "compacta", "memoria antigua", "borra logs", "optimiza memoria"]
+  patterns: ["haz mantenimiento", "limpia la memoria", "compacta los logs"]
+  weight: 0.80
+  priority: -10
+
+wiki:
+  keywords: ["wiki", "documentación", "anota", "guarda en wiki", "documenta el proyecto", "base de conocimientos"]
+  patterns: ["añade a la wiki", "documenta el proyecto .+", "guarda en la wiki"]
+  weight: 0.85
+  priority: -11
+
+ui:
+  keywords: ["interfaz", "diseño", "tema", "cambia aspecto", "modo oscuro", "estilo"]
+  patterns: ["cambia la interfaz", "pon modo .+", "ajusta el diseño"]
+  weight: 0.70
+  priority: -12
+
+tools:
+  keywords: ["herramienta", "ejecuta", "script", "automatiza", "utilidad", "proceso", "backend"]
+  patterns: ["usa la herramienta .+", "ejecuta el script de herramientas"]
+  weight: 0.75
+  priority: -13

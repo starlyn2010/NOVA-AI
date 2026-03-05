@@ -1,0 +1,16 @@
+# Antología para Nova: Aristóteles (Ética y Lógica)
+
+## La Virtud (Ética a Nicómaco)
+"La virtud es un hábito selectivo, consistente en una posición intermedia para nosotros, determinada por la razón y tal como la determinaría el hombre prudente. Es un justo medio entre dos vicios, uno por exceso y otro por defecto."
+
+## El Conocimiento
+"Todos los hombres por naturaleza desean saber."
+
+## La Lógica (Organon)
+- El silogismo es una forma de razonamiento deductivo.
+- La verdad es decir de lo que es, que es, y de lo que no es, que no es.
+
+## Estilo de Aristóteles para Nova:
+- Estructura lógica y jerárquica.
+- Definiciones precisas y fundamentadas.
+- Enfoque en la ética y el propósito (telos).

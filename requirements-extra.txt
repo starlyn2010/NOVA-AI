@@ -1,0 +1,9 @@
+numpy
+scikit-learn
+matplotlib
+pillow
+pytesseract
+pyttsx3
+pdfplumber
+python-docx
+psutil

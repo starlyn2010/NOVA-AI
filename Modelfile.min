@@ -1,0 +1,15 @@
+
+# Nova v3.2 - Absolute Minimum Fusion
+FROM deepseek-coder:1.3b
+
+# REDUCCION AGRESIVA DE HILOS Y CONTEXTO PARA CPU 8GB
+PARAMETER num_ctx 512
+PARAMETER num_predict 128
+PARAMETER top_k 10
+PARAMETER top_p 0.5
+PARAMETER temperature 0.2
+
+SYSTEM """Eres Nova. Responde en español. Sé ultra breve."""
+
+TEMPLATE """USER: {{ .Prompt }}
+ASSISTANT: """

@@ -1,0 +1,64 @@
+system:
+  name: Nova
+  version: 2.8.0
+  mode: ollama
+llm:
+  backend: ollama
+  host: http://localhost:11434
+  default_model: nova-ultra
+  coding_model: nova-ultra
+  chat_model: nova-ultra
+  supervisor_model: nova-ultra
+  fallback_model: nova-ultra
+  timeout: 60
+  temperature: 0.4
+  context_window: 4096
+  max_tokens: 2048
+  n_threads: 4
+  n_batch: 128
+  n_gpu_layers: 0
+  local_runtime: disabled
+  mock_mode: false
+  auto_mock_on_timeout: false
+  real_response_timeout_sec: 45
+  mock_dataset_path: knowledge/datasets/logic_core.json
+router:
+  min_confidence: 0.4
+  use_llm_fallback: true
+  sticky_mode: true
+paths:
+  engines: engines
+  data: data
+  logs: logs
+ui:
+  theme: dark
+  font_size: 12
+
+connectors:
+  telegram:
+    bot_token: ''
+    chat_id: ''
+  whatsapp:
+    session_path: 'data/whatsapp_session'
+  pixazo:
+    api_key: ''
+    pro_plan: false
+  canva:
+    api_key: ''
+  github:
+    token: ''
+  google:
+    credentials_path: 'credentials.json'
+  notion:
+    api_key: ''
+  spotify:
+    client_id: ''
+    client_secret: ''
+    redirect_uri: 'http://localhost:8888/callback'
+  wolfram:
+    app_id: ''
+  trello:
+    api_key: ''
+    token: ''
+  vercel:
+    token: ''

@@ -1,0 +1,823 @@
+internal_agent_tools:
+  shortcut_creator:
+    action_type: execute_script
+    description: Crea un acceso directo de Nova en el escritorio del usuario.
+    keywords:
+    - clon
+    - acceso directo
+    - escritorio
+    - shortcut
+    - icono
+    name: Creador de Accesos Directos
+    script: tools/create_shortcut.py
+  skill_forge:
+    action_type: script
+    description: Crea dinámicamente nuevas habilidades (Skills) para Nova.
+    keywords:
+    - crear skill
+    - nueva habilidad
+    - enseñar
+    - aprender
+    name: SkillForge
+    script: tools/skill_generator.py
+tools:
+  activemq:
+    description: Servidor de mensajería multi-protocolo.
+    keywords:
+    - jms
+    - activemq
+    - broker
+    name: ActiveMQ
+  aircrack-ng:
+    description: Auditoría de redes inalámbricas.
+    keywords:
+    - wifi
+    - clave
+    - wpa2
+    - crack
+    name: Aircrack-ng
+  ansible:
+    description: Automatización de despliegue.
+    keywords:
+    - infraestructura
+    - servidores
+    - ssh
+    name: Ansible
+  apisix:
+    description: Gateway de API de alto rendimiento.
+    keywords:
+    - gateway
+    - lua
+    - apisix
+    - cloud
+    name: APISIX
+  auth0:
+    description: Plataforma de identidad como servicio.
+    keywords:
+    - auth0
+    - jwt
+    - login
+    name: Auth0
+  aws-cli:
+    description: Gestión de Amazon Web Services.
+    keywords:
+    - aws
+    - s3
+    - ec2
+    - nube
+    name: AWS CLI
+  beautifulsoup4:
+    description: Web scraping profesional.
+    keywords:
+    - scraping
+    - web
+    - html
+    - extraer
+    name: BeautifulSoup
+  boundary:
+    description: Gestión de acceso privilegiado.
+    keywords:
+    - pam
+    - access
+    - boundary
+    name: HashiCorp Boundary
+  burpsuite:
+    description: Proxy de seguridad web.
+    keywords:
+    - interceptar
+    - http
+    - proxy
+    name: Burp Suite
+  camunda:
+    description: Motor de procesos BPMN.
+    keywords:
+    - bpmn
+    - camunda
+    - procesos
+    name: Camunda
+  cassandra:
+    description: Base de datos distribuida escalable.
+    keywords:
+    - cassandra
+    - nosql
+    - columnar
+    name: Apache Cassandra
+  checkov:
+    description: Análisis estático de IaC.
+    keywords:
+    - terraform scan
+    - iac security
+    - checkov
+    name: Checkov
+  clickhouse:
+    description: Base de datos analítica columnar.
+    keywords:
+    - analytics
+    - olap
+    - clickhouse
+    name: ClickHouse
+  consul:
+    description: Descubrimiento de servicios y configuración.
+    keywords:
+    - service discovery
+    - kv
+    - consul
+    name: HashiCorp Consul
+  cosign:
+    description: Firma y verificación de contenedores.
+    keywords:
+    - sign
+    - verify
+    - sigstore
+    - cosign
+    name: Cosign
+  dask:
+    description: Computación paralela nativa en Python.
+    keywords:
+    - paralelismo
+    - dask
+    - big data
+    name: Dask
+  data_analysis:
+    category: data
+    install:
+      all: pip install pandas openpyxl
+    keywords:
+    - csv
+    - excel
+    - dataframe
+    - analizar datos
+    - pandas
+    - tabla
+    name: Pandas
+    python_example: 'import pandas as pd
+
+      df = pd.read_csv(''data.csv'')
+
+      print(df.head())
+
+      '
+  django:
+    description: Framework web robusto.
+    keywords:
+    - admin
+    - base de datos
+    - cms
+    name: Django
+  docker:
+    description: Contenedores y virtualización.
+    keywords:
+    - contendor
+    - docker
+    - aislar
+    name: Docker
+  drizzle:
+    description: ORM ligero y rápido para TypeScript.
+    keywords:
+    - drizzle
+    - typescript
+    - orm
+    name: Drizzle ORM
+  falco:
+    description: Seguridad en tiempo de ejecución para cloud native.
+    keywords:
+    - falco
+    - runtime security
+    - ebpf
+    name: Falco
+  fastapi:
+    description: API REST de alta velocidad.
+    keywords:
+    - endpoint
+    - asincrono
+    - docs
+    name: FastAPI
+  ffmpeg:
+    description: Procesamiento de audio y video.
+    keywords:
+    - video
+    - audio
+    - convertir
+    - mp4
+    name: FFmpeg
+  flask:
+    description: Microframework web.
+    keywords:
+    - servidor
+    - web
+    - backend
+    name: Flask
+  ghidra:
+    description: Software de análisis de software de la NSA.
+    dont_use_this_as_main_key: true
+    keywords:
+    - NSA
+    - decompilar
+    - ghidra
+    name: Ghidra
+  git:
+    description: Control de versiones.
+    keywords:
+    - branch
+    - commit
+    - push
+    - pull
+    name: Git
+  gobuster:
+    description: Búsqueda de archivos y directorios ocultos.
+    keywords:
+    - directorio
+    - fuerza bruta
+    - url
+    name: gobuster
+  gradio:
+    description: Interfaces rápidas para modelos de IA.
+    keywords:
+    - demo ai
+    - gradio
+    - ui
+    name: Gradio
+  grafana:
+    description: Monitoreo y dashboards.
+    keywords:
+    - dashboard
+    - metricas
+    - vigilar
+    name: Grafana
+  graphql:
+    description: Query language para APIs.
+    keywords:
+    - query
+    - schema
+    - apì
+    name: GraphQL
+  grype:
+    description: Escáner de vulnerabilidades en SBOM.
+    keywords:
+    - grype
+    - sbom
+    - security
+    name: Grype
+  hashcat:
+    description: Recuperador de contraseñas por GPU.
+    keywords:
+    - hash
+    - sha256
+    - md5
+    - romper
+    name: Hashcat
+  helm:
+    description: Gestor de paquetes para Kubernetes.
+    keywords:
+    - helm
+    - chart
+    - k8s deployment
+    name: Helm
+  influxdb:
+    description: Base de datos de series temporales.
+    keywords:
+    - time series
+    - metricas
+    - influx
+    name: InfluxDB
+  istio:
+    description: Service mesh para conectar y asegurar microservicios.
+    keywords:
+    - service mesh
+    - istio
+    - envoy
+    name: Istio
+  jest:
+    description: Testing de JavaScript.
+    keywords:
+    - tests
+    - js
+    - unitario
+    name: Jest
+  john-the-ripper:
+    description: Cracker de contraseñas multiprotocolo.
+    keywords:
+    - password
+    - brutus
+    - shadow
+    name: John the Ripper
+  keycloak:
+    description: Gestión de identidad y accesos open source.
+    keywords:
+    - iam
+    - sso
+    - auth
+    - keycloak
+    name: Keycloak
+  kong:
+    description: Gateway de API cloud-native.
+    keywords:
+    - gateway
+    - proxy
+    - api
+    - kong
+    name: Kong
+  krakend:
+    description: Gateway de API ultra rápido sin estado.
+    keywords:
+    - gateway
+    - krakend
+    - lfe
+    name: KrakenD
+  kubeflow:
+    description: Platforma de ML sobre Kubernetes.
+    keywords:
+    - k8s
+    - ml
+    - kubeflow
+    - pipeline
+    name: Kubeflow
+  kubernetes:
+    description: Orquestación de contenedores.
+    keywords:
+    - cluster
+    - k8s
+    - pod
+    name: Kubernetes
+  kubescape:
+    description: Seguridad en Kubernetes y KSPM.
+    keywords:
+    - k8s security
+    - compliance
+    - kubescape
+    name: Kubescape
+  masscan:
+    description: El escáner de red más rápido.
+    keywords:
+    - escanear
+    - internet
+    - rapido
+    name: Masscan
+  matplotlib:
+    description: Graficación 2D dinámica.
+    keywords:
+    - grafica
+    - plot
+    - dibujar
+    name: Matplotlib
+  metasploit:
+    description: Framework de pruebas de penetración.
+    keywords:
+    - explotar
+    - pentesting
+    - hacking
+    name: Metasploit
+  mlflow:
+    description: Gestión del ciclo de vida de ML.
+    keywords:
+    - mlflow
+    - experimentos
+    - model registry
+    name: MLflow
+  mongodb:
+    description: Base de datos NoSQL.
+    keywords:
+    - documentos
+    - nosql
+    - flexible
+    name: MongoDB
+  mqtt:
+    description: Protocolo de mensajería para IoT.
+    keywords:
+    - iot
+    - mqtt
+    - mosquitto
+    name: MQTT
+  nats:
+    description: Sistema de mensajería cloud-native ultra-rápido.
+    keywords:
+    - messaging
+    - nats
+    - pubsub
+    name: NATS
+  neo4j:
+    description: Base de datos orientada a grafos.
+    keywords:
+    - grafos
+    - nodos
+    - neo4j
+    name: Neo4j
+  nextjs:
+    description: Full-stack framework React.
+    keywords:
+    - ssr
+    - estatico
+    - next
+    name: Next.js
+  nikto:
+    description: Escaner de vulnerabilidades en servidores web.
+    keywords:
+    - vulnerabilidad
+    - servidor
+    - cgi
+    name: Nikto
+  nmap:
+    description: Explorador de red y puertos.
+    keywords:
+    - escanear
+    - puertos
+    - red
+    - nmap
+    name: Nmap
+  node:
+    description: Entorno de ejecución JS backend.
+    keywords:
+    - javascript
+    - npi
+    - servidor
+    name: Node.js
+  nomad:
+    description: Orquestador de cargas de trabajo flexible.
+    keywords:
+    - orquestador
+    - nomad
+    - jobs
+    name: HashiCorp Nomad
+  numpy:
+    description: Computación numérica avanzada.
+    keywords:
+    - matriz
+    - calculo
+    - array
+    name: NumPy
+  ocr:
+    category: image_processing
+    install:
+      windows: '1. Instalar Tesseract Binary
+
+        2. pip install pytesseract pillow'
+    keywords:
+    - leer texto
+    - imagen a texto
+    - ocr
+    - reconocer caracteres
+    - pytesseract
+    name: Tesseract OCR
+    python_example: 'import pytesseract
+
+      from PIL import Image
+
+      # pytesseract.pytesseract.tesseract_cmd = r''C:\Program Files\Tesseract-OCR\tesseract.exe''
+
+      text = pytesseract.image_to_string(Image.open(''image.png''))
+
+      '
+  opencv:
+    description: Visión artificial y procesamiento de imagen.
+    keywords:
+    - cara
+    - identificar
+    - bordes
+    - ojo
+    name: OpenCV
+  optuna:
+    description: Optimización de hiperparámetros automatizada.
+    keywords:
+    - hiperparametros
+    - optuna
+    - tuning
+    name: Optuna
+  owasp-zap:
+    description: Escáner de seguridad web dinámico.
+    keywords:
+    - seguridad
+    - web
+    - scan
+    name: OWASP ZAP
+  pandas:
+    description: Manipulación de datos tabulares.
+    keywords:
+    - dataframe
+    - excel
+    - csv
+    - datos
+    name: Pandas
+  plotting:
+    category: data_viz
+    install:
+      all: pip install matplotlib
+    keywords:
+    - graficar
+    - plot
+    - dibujar gráfica
+    - chart
+    - matplotlib
+    name: Matplotlib
+    python_example: 'import matplotlib.pyplot as plt
+
+      plt.plot([1, 2, 3], [4, 5, 1])
+
+      plt.show()
+
+      '
+  postgresql:
+    description: Base de datos SQL avanzada.
+    keywords:
+    - sql
+    - tablas
+    - relacional
+    name: PostgreSQL
+  prisma:
+    description: ORM moderno para TypeScript y Python.
+    keywords:
+    - prisma
+    - schema
+    - database
+    name: Prisma
+  prometheus:
+    description: Sistemas de alertas y monitoreo.
+    keywords:
+    - alertas
+    - series temporales
+    name: Prometheus
+  prowler:
+    description: Auditoría de seguridad en la nube.
+    keywords:
+    - seguridad
+    - cloud
+    - audit
+    name: Prowler
+  pulumi:
+    description: IaC usando lenguajes de programación reales.
+    keywords:
+    - iac
+    - cloud
+    - pulumi
+    name: Pulumi
+  pytest:
+    description: Testing de Python eficaz.
+    keywords:
+    - unitest
+    - python
+    - prueba
+    name: PyTest
+  pytorch:
+    description: IA profunda flexible.
+    keywords:
+    - torch
+    - tensor
+    - gpu
+    name: PyTorch
+  rabbitmq:
+    description: Broker de mensajería asíncrona.
+    keywords:
+    - colas
+    - mensajeria
+    - amqp
+    - rabbitmq
+    name: RabbitMQ
+  radare2:
+    description: Ingeniería inversa avanzada.
+    keywords:
+    - binario
+    - hex
+    - reverso
+    name: Radare2
+  ray:
+    description: Runtime de computación distribuida para IA.
+    keywords:
+    - distribuido
+    - ray
+    - scaling
+    name: Ray
+  react:
+    description: Librería UI por componentes.
+    keywords:
+    - componentes
+    - hooks
+    - frontend
+    name: React
+  redis:
+    description: Cache y base de datos en RAM.
+    keywords:
+    - cache
+    - clave-valor
+    - rapidez
+    name: Redis
+  requests:
+    description: Peticiones HTTP simples.
+    keywords:
+    - api
+    - http
+    - get
+    - post
+    name: Requests
+  sanic:
+    description: Framework web async de alta velocidad.
+    keywords:
+    - web
+    - async
+    - sanic
+    - rapido
+    name: Sanic
+  scikit-learn:
+    description: Machine learning para Python.
+    keywords:
+    - prediccion
+    - entrenamiento
+    - modelo
+    name: Scikit-Learn
+  scylladb:
+    description: NoSQL de alto rendimiento compatible con Cassandra.
+    keywords:
+    - scylladb
+    - rapido
+    - full-throttle
+    name: ScyllaDB
+  selenium:
+    description: Automatización de navegadores.
+    keywords:
+    - navegador
+    - click
+    - web
+    - automatizar
+    name: Selenium
+  sqlalchemy:
+    description: El toolkit SQL y ORM definitivo para Python.
+    keywords:
+    - sqlalchemy
+    - orm
+    - sql
+    name: SQLAlchemy
+  sqli-map:
+    description: Detección automática de inyección SQL.
+    keywords:
+    - sqli
+    - vulnerabilidad
+    - db
+    name: sqlmap
+  streamlit:
+    description: Apps de datos rápidas en Python.
+    keywords:
+    - web app
+    - data science
+    - streamlit
+    name: Streamlit
+  suricata:
+    description: Motor de detección de intrusiones (IDS/IPS).
+    keywords:
+    - ids
+    - ips
+    - monitoreo de red
+    name: Suricata
+  syft:
+    description: Generador de SBOM profesional.
+    keywords:
+    - sbom
+    - syft
+    - inventory
+    name: Syft
+  tailwind:
+    description: Estilizado rápido con clases.
+    keywords:
+    - diseño
+    - css
+    - clases
+    name: Tailwind CSS
+  tauri:
+    description: Apps de escritorio seguras y ligeras con Rust.
+    keywords:
+    - tauri
+    - desktop app
+    - rust
+    - frontend
+    name: Tauri
+  temporal:
+    description: Orquestación de workflows duraderos.
+    keywords:
+    - workflow
+    - durability
+    - temporal
+    name: Temporal
+  tensorflow:
+    description: Deep learning avanzado.
+    keywords:
+    - redes neuronales
+    - ai
+    - aprendizaje
+    name: TensorFlow
+  terraform:
+    description: Infraestructura como código.
+    keywords:
+    - cloud
+    - terraform
+    - infra
+    name: Terraform
+  terragrunt:
+    description: Wrapper para mantener Terraform DRY.
+    keywords:
+    - terraform
+    - terragrunt
+    - dry
+    name: Terragrunt
+  timescale:
+    description: SQL masivo para series temporales.
+    keywords:
+    - timescale
+    - postgres
+    - tsdb
+    name: TimescaleDB
+  tortoise-orm:
+    description: ORM asíncrono para Python inspirado en Django.
+    keywords:
+    - orm
+    - async
+    - tortoise
+    - db
+    name: Tortoise ORM
+  trivy:
+    description: Escáner de vulnerabilidades para contenedores.
+    keywords:
+    - scanner
+    - vulnerabilidades
+    - container
+    - trivy
+    name: Trivy
+  trufflehog:
+    description: Búsqueda de secretos en repositorios.
+    keywords:
+    - secretos
+    - repo
+    - key
+    - password
+    name: Trufflehog
+  tyk:
+    description: Plataforma de gestión de APIs.
+    keywords:
+    - api management
+    - tyk
+    - gateway
+    name: Tyk
+  vault:
+    description: Gestión de secretos y cifrado de datos.
+    keywords:
+    - vault
+    - secrets
+    - pki
+    name: HashiCorp Vault
+  vite:
+    description: Entorno de desarrollo ultra rápido.
+    keywords:
+    - hot-reload
+    - frontend
+    - dev
+    name: Vite
+  wandb:
+    description: Pesos y sesgos para experimentos de IA.
+    keywords:
+    - visualizar ai
+    - experimentos
+    - wandb
+    name: W&B
+  waypoint:
+    description: Despliegue de aplicaciones simplificado.
+    keywords:
+    - deploy
+    - waypoint
+    - app
+    name: HashiCorp Waypoint
+  web_scraping:
+    category: web
+    install:
+      all: pip install beautifulsoup4 requests
+    keywords:
+    - scraping
+    - extraer datos web
+    - parsear html
+    - beautifulsoup
+    name: BeautifulSoup
+    python_example: 'import requests
+
+      from bs4 import BeautifulSoup
+
+      res = requests.get(''https://example.com'')
+
+      soup = BeautifulSoup(res.text, ''html.parser'')
+
+      '
+  webpack:
+    description: Empaquetador de módulos JS.
+    keywords:
+    - bundle
+    - build
+    - compilar
+    name: Webpack
+  wireshark:
+    description: Protocolos de red.
+    keywords:
+    - paquetes
+    - sniffing
+    - trafico
+    name: Wireshark
+  zeek:
+    description: Monitor de seguridad de red avanzado.
+    keywords:
+    - zeek
+    - bro
+    - network logs
+    name: Zeek
