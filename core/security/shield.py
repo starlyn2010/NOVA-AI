@@ -7,12 +7,30 @@ class SecurityShield:
     patrones maliciosos, scripts ocultos y macros peligrosas.
     """
     def __init__(self):
+        # Base path for project security context
+        self.base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        self.max_scan_bytes = int(os.getenv("NOVA_MAX_SCAN_BYTES", "2000000"))
+        
         # Patrones comunes de malware/scripts peligrosos
         self.malicious_patterns = [
             r"eval\(", r"exec\(", r"os\.system\(", r"subprocess\.Popen", 
             r"powershell -e", r"base64\.b64decode", r"shutil\.rmtree",
             r"\\.exe", r"\\.dll", r"\\.bat", r"\\.sh", r"\\.vbs"
         ]
+        
+        # Allowed execution directories
+        self.allowlist_dirs = [
+            os.path.join(self.base_path, "tools"),
+            os.path.join(self.base_path, "engines"),
+        ]
+
+    def is_path_safe(self, file_path: str) -> bool:
+        """Verifica si la ruta está dentro del proyecto y no es un escape de directorio."""
+        try:
+            abs_path = os.path.abspath(file_path)
+            return os.path.commonpath([self.base_path, abs_path]) == self.base_path
+        except Exception:
+            return False
 
     def scan_file(self, file_path: str) -> dict:
         """Escanea un archivo y devuelve el nivel de riesgo. Seguro contra KeyErrors."""
@@ -24,10 +42,34 @@ class SecurityShield:
             "message": ""
         }
 
-        if not file_path or not os.path.exists(file_path):
+        if not file_path:
+            res["status"] = "error"
+            res["risk_level"] = "UNKNOWN"
+            res["message"] = "Ruta vacía."
+            return res
+
+        if not self.is_path_safe(file_path):
+            res["status"] = "error"
+            res["risk_level"] = "HIGH"
+            res["message"] = "Acceso denegado: ruta fuera del proyecto."
+            return res
+
+        if not os.path.exists(file_path):
             res["status"] = "error"
             res["risk_level"] = "UNKNOWN"
             res["message"] = f"Archivo no encontrado: {file_path}"
+            return res
+
+        try:
+            if os.path.getsize(file_path) > self.max_scan_bytes:
+                res["status"] = "error"
+                res["risk_level"] = "MEDIUM"
+                res["message"] = "Archivo demasiado grande para escaneo de seguridad."
+                return res
+        except Exception as e:
+            res["status"] = "error"
+            res["risk_level"] = "UNKNOWN"
+            res["message"] = f"Error leyendo tamaño de archivo: {e}"
             return res
 
         risk_score = 0
