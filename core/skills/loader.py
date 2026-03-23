@@ -55,7 +55,7 @@ class SkillLoader:
                 try:
                     metadata = yaml.safe_load(match.group(1))
                     instructions = content[match.end():].strip()
-                except:
+                except Exception:
                     pass
 
             return Skill(name, os.path.dirname(file_path), metadata, instructions)
