@@ -23,10 +23,9 @@ class UIController:
             return self.themes["standard"]
 
     def process(self, intent: str, health_check: bool = False) -> dict:
+        """Interfaz para el Orchestrator."""
         if health_check:
             return {"status": "success", "message": "UIController ready."}
-            
-        """Interfaz para el Orchestrator."""
         style = self.get_style_hook(intent)
         return {
             "status": "success",
