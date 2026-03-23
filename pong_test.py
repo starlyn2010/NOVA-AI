@@ -98,9 +98,4 @@ class Pong:
 
 if __name__ == '__main__':
     game = Pong()
-    while True:
-        game.handle_events()
-        game.game_loop()
-
-        # Limitar el tiempo de ejecución
-        game.clock.tick(60)
+    game.game_loop()
