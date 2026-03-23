@@ -6,8 +6,12 @@ class Supervisor:
     def __init__(self):
         # Load config to get model names
         config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "config.yaml")
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = yaml.safe_load(f)
+        config = {}
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = yaml.safe_load(f) or {}
+        except Exception:
+            config = {}
              
         llm_cfg = config.get("llm", {})
         self.supervisor_model = llm_cfg.get("supervisor_model", "local-gguf")
