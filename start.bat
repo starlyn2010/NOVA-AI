@@ -27,5 +27,5 @@ if errorlevel 1 (
 
 REM 4. Launch Nova UI
 echo [OK] Lanzando Nova...
-start "Nova v2.7.1" venv\Scripts\pythonw.exe ui\main.py
+start "Nova v2.8.0" venv\Scripts\pythonw.exe ui\main.py
 exit
