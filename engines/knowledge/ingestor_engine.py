@@ -60,7 +60,7 @@ class KnowledgeIngestor:
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
-            except:
+            except UnicodeDecodeError:
                 with open(file_path, "r", encoding="latin-1") as f:
                     content = f.read()
         else:
