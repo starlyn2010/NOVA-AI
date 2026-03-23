@@ -18,6 +18,7 @@ class MemoryEngine:
     def __init__(self, data_path: str = None):
         self.memories: Dict[str, MemoryUnit] = {}
         self.archive: Dict[str, MemoryUnit] = {}
+        self._content_index: Dict[str, str] = {} # content_hash -> unit_id
         
         # Persistence path
         if data_path is None:
@@ -30,11 +31,19 @@ class MemoryEngine:
         
         # Initialize semantic layer
         self.semantic = SemanticMemory(self.memory_file)
-        
+
+    def _get_content_hash(self, content: str) -> str:
+        import hashlib
+        return hashlib.md5(content.strip().encode('utf-8')).hexdigest()
+
     def store(self, content: str, source: str, metadata: Dict = None) -> MemoryUnit:
         """Creates and indexes a new memory."""
         unit = MemoryUnit(content=content, source=source, metadata=metadata or {})
         self.memories[unit.id] = unit
+        
+        # Index by content hash for O(1) retrieval from semantic hits
+        self._content_index[self._get_content_hash(content)] = unit.id
+        
         print(f"[Memory] Stored: {content[:40]}... (ID: {unit.id[:8]})")
         self.save()
         
@@ -67,13 +76,10 @@ class MemoryEngine:
         semantic_texts = self.semantic.find_relevant(query, top_k=max_results)
         semantic_hits = []
         for text in semantic_texts:
-            # Encontrar la unidad original por contenido (u optimizar guardando IDs)
-            found = False
-            for unit in self.memories.values():
-                if unit.content == text:
-                    semantic_hits.append((unit, 0.8)) # Score fijo alto para semántica
-                    found = True
-                    break
+            c_hash = self._get_content_hash(text)
+            unit_id = self._content_index.get(c_hash)
+            if unit_id and unit_id in self.memories:
+                semantic_hits.append((self.memories[unit_id], 0.8))
         
         # Fusionar y ordenar
         all_hits = keyword_hits + semantic_hits
@@ -154,7 +160,9 @@ class MemoryEngine:
                 data = json.load(f)
             
             for uid, unit_data in data.get("memories", {}).items():
-                self.memories[uid] = MemoryUnit.from_dict(unit_data)
+                unit = MemoryUnit.from_dict(unit_data)
+                self.memories[uid] = unit
+                self._content_index[self._get_content_hash(unit.content)] = uid
             
             for uid, unit_data in data.get("archive", {}).items():
                 self.archive[uid] = MemoryUnit.from_dict(unit_data)
