@@ -7,8 +7,12 @@ class CompactionEngine:
     Motor de Compactación de Memoria: Resume logs antiguos
     para mantener el contexto relevante sin saturar el sistema.
     """
-    def __init__(self, logs_path="logs"):
-        self.logs_path = logs_path
+    def __init__(self, logs_path=None):
+        self.base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        if logs_path is None:
+            self.logs_path = os.path.join(self.base_path, "logs")
+        else:
+            self.logs_path = logs_path
 
     def get_old_logs(self, days=7):
         """Busca logs más antiguos que N días."""
@@ -41,7 +45,8 @@ class CompactionEngine:
         summary += f"Compactados logs de {len(old_logs)} sesiones de actividad."
         
         # Guardar resumen en la memoria persistente
-        memory_file = os.path.join("data", "compacted_memory.txt")
+        memory_file = os.path.join(self.base_path, "data", "compacted_memory.txt")
+        os.makedirs(os.path.dirname(memory_file), exist_ok=True)
         with open(memory_file, "a", encoding="utf-8") as f:
             f.write(summary + "\n")
             
