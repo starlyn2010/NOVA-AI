@@ -108,11 +108,17 @@ class FileEngine:
             if self._is_blacklisted(found_path):
                 return {"status": "error", "message": "Acceso denegado. No tengo permiso para leer mis propios archivos."}
 
+            max_bytes = 5000
+            try:
+                file_size = os.path.getsize(found_path)
+            except Exception:
+                file_size = 0
+
             with open(found_path, "r", encoding="utf-8", errors="ignore") as f:
-                content = f.read()
+                content = f.read(max_bytes)
             
-            if len(content) > 5000:
-                short_content = content[:5000] + "\n... (archivo truncado por tamaño) ..."
+            if file_size > max_bytes:
+                short_content = content + "\n... (archivo truncado por tamaño) ..."
             else:
                 short_content = content
 
