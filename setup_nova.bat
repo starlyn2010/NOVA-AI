@@ -1,7 +1,7 @@
 @echo off
 title Nova Setup (Local GGUF)
 echo ============================================
-echo   Configurando Nova v2.7.1 (Sin Ollama)
+echo   Configurando Nova v2.8.0 (Sin Ollama)
 echo ============================================
 echo.
 
