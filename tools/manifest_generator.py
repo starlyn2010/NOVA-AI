@@ -21,7 +21,7 @@ class ManifestGenerator:
                 while chunk := f.read(4096):
                     hasher.update(chunk)
             return hasher.hexdigest()
-        except:
+        except Exception:
             return "n/a"
 
     def register_file(self, filepath, description, category="code"):
