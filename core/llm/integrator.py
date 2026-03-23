@@ -1,4 +1,4 @@
-﻿from .ollama_client import OllamaClient
+from .ollama_client import OllamaClient
 from core.memory.dynamic_memory import DynamicMemory
 import yaml
 import os
@@ -19,11 +19,13 @@ class NovaIntegrator:
             self.fallback_model = llm_cfg.get("fallback_model", "local-gguf")
             self.request_timeout = int(llm_cfg.get("timeout", 30))
             self.context_window = int(llm_cfg.get("context_window", 4096))
+            self.engine_ctx_max_chars = int(llm_cfg.get("engine_ctx_max_chars", 3000))
         except Exception:
             self.model = "local-gguf"
             self.fallback_model = "local-gguf"
             self.request_timeout = 30
             self.context_window = 4096
+            self.engine_ctx_max_chars = 3000
 
         self.test_mode = os.getenv("NOVA_TEST_MODE", "").strip().lower() in {
             "1",
@@ -55,6 +57,8 @@ class NovaIntegrator:
             "4) Artefactos largos:\n"
             "- Para codigo o documentos extensos usa <artifact title=\"Nombre\" type=\"lenguaje\">...</artifact>."
         )
+        if not isinstance(self.engine_ctx_max_chars, int) or self.engine_ctx_max_chars <= 0:
+            self.engine_ctx_max_chars = 3000
 
     def set_memory_summary(self, summary: str):
         self.memory_summary = summary
@@ -121,402 +125,62 @@ class NovaIntegrator:
         status = engine_outputs.get("status", "unknown")
         return f"Tarea procesada por el motor '{engine_name}' con estado '{status}'."
 
-    def _bank_app_template(self) -> str:
-        return """from flask import Flask, request, session, redirect, url_for, render_template_string, flash
-import sqlite3
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+    def _build_engine_context(self, engine_outputs: dict) -> str:
+        if not isinstance(engine_outputs, dict):
+            return ""
 
-app = Flask(__name__)
-app.secret_key = "change_this_secret"
-DB = "bank.db"
+        parts = []
 
-BASE_HTML = '''
-<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>Bank App</title></head>
-<body>
-  <h2>{{ title }}</h2>
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul>{% for m in messages %}<li>{{ m }}</li>{% endfor %}</ul>
-    {% endif %}
-  {% endwith %}
-  {{ body|safe }}
-  <hr>
-  <a href="/">Inicio</a>
-  {% if session.get('user_id') %}
-    | <a href="/dashboard">Dashboard</a>
-    | <a href="/logout">Salir</a>
-  {% endif %}
-</body>
-</html>
-'''
+        def add_block(label: str, value) -> None:
+            if value is None:
+                return
+            text = str(value).strip()
+            if not text:
+                return
+            parts.append(f"{label}:\n{text}")
 
-def conn():
-    c = sqlite3.connect(DB)
-    c.row_factory = sqlite3.Row
-    return c
+        add_block("INSTRUCCIONES_DEL_MOTOR", engine_outputs.get("instructions_for_llm"))
+        add_block("CONTEXTO_RAG", engine_outputs.get("context"))
+        add_block("RESULTADOS_WEB", engine_outputs.get("web_results"))
+        add_block("CONTENIDO_ARCHIVO", engine_outputs.get("file_content"))
+        add_block("REPORTE_SEGURIDAD", engine_outputs.get("security_report"))
+        add_block("REPORTE_SISTEMA", engine_outputs.get("health_report"))
+        add_block("MENSAJE_MOTOR", engine_outputs.get("message"))
 
-def init_db():
-    c = conn()
-    c.executescript('''
-    CREATE TABLE IF NOT EXISTS users(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      created_at TEXT NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS accounts(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      balance REAL NOT NULL DEFAULT 0,
-      FOREIGN KEY(user_id) REFERENCES users(id)
-    );
-    CREATE TABLE IF NOT EXISTS transactions(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      account_id INTEGER NOT NULL,
-      type TEXT NOT NULL,
-      amount REAL NOT NULL,
-      note TEXT,
-      created_at TEXT NOT NULL,
-      FOREIGN KEY(account_id) REFERENCES accounts(id)
-    );
-    ''')
-    c.commit()
-    c.close()
+        if not parts:
+            return ""
 
-def current_user():
-    uid = session.get("user_id")
-    if not uid:
-        return None
-    c = conn()
-    u = c.execute("SELECT * FROM users WHERE id=?", (uid,)).fetchone()
-    c.close()
-    return u
+        text = "\n\n".join(parts)
+        max_chars = max(500, int(self.engine_ctx_max_chars))
+        if len(text) > max_chars:
+            text = text[:max_chars] + "\n...[truncado]..."
+        return text
 
-def account_by_user(user_id):
-    c = conn()
-    a = c.execute("SELECT * FROM accounts WHERE user_id=?", (user_id,)).fetchone()
-    c.close()
-    return a
-
-@app.route("/")
-def home():
-    if current_user():
-        return redirect(url_for("dashboard"))
-    body = '''
-    <a href="/register">Crear cuenta</a><br>
-    <a href="/login">Iniciar sesion</a>
-    '''
-    return render_template_string(BASE_HTML, title="Bank App", body=body)
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
-        if len(username) < 3 or len(password) < 6:
-            flash("Usuario minimo 3 chars y password minimo 6.")
-            return redirect(url_for("register"))
-        c = conn()
+    def _load_template(self, filename: str) -> str:
+        base = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        path = os.path.join(base, "core", "templates", filename)
         try:
-            c.execute(
-                "INSERT INTO users(username,password_hash,created_at) VALUES(?,?,?)",
-                (username, generate_password_hash(password), datetime.utcnow().isoformat()),
-            )
-            uid = c.execute("SELECT id FROM users WHERE username=?", (username,)).fetchone()["id"]
-            c.execute("INSERT INTO accounts(user_id,balance) VALUES(?,?)", (uid, 0))
-            c.commit()
-            flash("Cuenta creada. Ahora inicia sesion.")
-            return redirect(url_for("login"))
-        except sqlite3.IntegrityError:
-            flash("Usuario ya existe.")
-        finally:
-            c.close()
-    body = '''
-    <form method="post">
-      Usuario: <input name="username"><br>
-      Password: <input name="password" type="password"><br>
-      <button>Registrar</button>
-    </form>
-    '''
-    return render_template_string(BASE_HTML, title="Registro", body=body)
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
-        c = conn()
-        u = c.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
-        c.close()
-        if not u or not check_password_hash(u["password_hash"], password):
-            flash("Credenciales invalidas.")
-            return redirect(url_for("login"))
-        session["user_id"] = u["id"]
-        return redirect(url_for("dashboard"))
-    body = '''
-    <form method="post">
-      Usuario: <input name="username"><br>
-      Password: <input name="password" type="password"><br>
-      <button>Entrar</button>
-    </form>
-    '''
-    return render_template_string(BASE_HTML, title="Login", body=body)
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    flash("Sesion cerrada.")
-    return redirect(url_for("home"))
-
-@app.route("/dashboard")
-def dashboard():
-    u = current_user()
-    if not u:
-        return redirect(url_for("login"))
-    a = account_by_user(u["id"])
-    body = f'''
-    <p>Usuario: <b>{u["username"]}</b></p>
-    <p>Saldo actual: <b>{a["balance"]:.2f}</b></p>
-    <a href="/deposit">Depositar</a><br>
-    <a href="/withdraw">Retirar</a><br>
-    <a href="/transfer">Transferir</a><br>
-    <a href="/history">Historial</a><br>
-    '''
-    return render_template_string(BASE_HTML, title="Dashboard", body=body)
-
-def add_tx(account_id, ttype, amount, note):
-    c = conn()
-    c.execute(
-        "INSERT INTO transactions(account_id,type,amount,note,created_at) VALUES(?,?,?,?,?)",
-        (account_id, ttype, amount, note, datetime.utcnow().isoformat()),
-    )
-    c.commit()
-    c.close()
-
-@app.route("/deposit", methods=["GET", "POST"])
-def deposit():
-    u = current_user()
-    if not u:
-        return redirect(url_for("login"))
-    a = account_by_user(u["id"])
-    if request.method == "POST":
-        amount = float(request.form.get("amount", "0"))
-        if amount <= 0:
-            flash("Monto invalido.")
-            return redirect(url_for("deposit"))
-        c = conn()
-        c.execute("UPDATE accounts SET balance = balance + ? WHERE id=?", (amount, a["id"]))
-        c.commit()
-        c.close()
-        add_tx(a["id"], "deposit", amount, "Deposito")
-        flash("Deposito aplicado.")
-        return redirect(url_for("dashboard"))
-    body = '<form method="post">Monto: <input name="amount" type="number" step="0.01"><button>Depositar</button></form>'
-    return render_template_string(BASE_HTML, title="Deposito", body=body)
-
-@app.route("/withdraw", methods=["GET", "POST"])
-def withdraw():
-    u = current_user()
-    if not u:
-        return redirect(url_for("login"))
-    a = account_by_user(u["id"])
-    if request.method == "POST":
-        amount = float(request.form.get("amount", "0"))
-        if amount <= 0 or amount > a["balance"]:
-            flash("Monto invalido o saldo insuficiente.")
-            return redirect(url_for("withdraw"))
-        c = conn()
-        c.execute("UPDATE accounts SET balance = balance - ? WHERE id=?", (amount, a["id"]))
-        c.commit()
-        c.close()
-        add_tx(a["id"], "withdraw", amount, "Retiro")
-        flash("Retiro aplicado.")
-        return redirect(url_for("dashboard"))
-    body = '<form method="post">Monto: <input name="amount" type="number" step="0.01"><button>Retirar</button></form>'
-    return render_template_string(BASE_HTML, title="Retiro", body=body)
-
-@app.route("/transfer", methods=["GET", "POST"])
-def transfer():
-    u = current_user()
-    if not u:
-        return redirect(url_for("login"))
-    src = account_by_user(u["id"])
-    if request.method == "POST":
-        target_username = request.form.get("target", "").strip()
-        amount = float(request.form.get("amount", "0"))
-        if amount <= 0 or amount > src["balance"]:
-            flash("Monto invalido o saldo insuficiente.")
-            return redirect(url_for("transfer"))
-        c = conn()
-        tgt_user = c.execute("SELECT id FROM users WHERE username=?", (target_username,)).fetchone()
-        if not tgt_user:
-            c.close()
-            flash("Usuario destino no existe.")
-            return redirect(url_for("transfer"))
-        tgt_acc = c.execute("SELECT id FROM accounts WHERE user_id=?", (tgt_user["id"],)).fetchone()
-        c.execute("UPDATE accounts SET balance = balance - ? WHERE id=?", (amount, src["id"]))
-        c.execute("UPDATE accounts SET balance = balance + ? WHERE id=?", (amount, tgt_acc["id"]))
-        c.commit()
-        c.close()
-        add_tx(src["id"], "transfer_out", amount, f"A {target_username}")
-        add_tx(tgt_acc["id"], "transfer_in", amount, f"De {u['username']}")
-        flash("Transferencia realizada.")
-        return redirect(url_for("dashboard"))
-    body = '''
-    <form method="post">
-      Usuario destino: <input name="target"><br>
-      Monto: <input name="amount" type="number" step="0.01"><br>
-      <button>Transferir</button>
-    </form>
-    '''
-    return render_template_string(BASE_HTML, title="Transferencia", body=body)
-
-@app.route("/history")
-def history():
-    u = current_user()
-    if not u:
-        return redirect(url_for("login"))
-    a = account_by_user(u["id"])
-    c = conn()
-    rows = c.execute(
-        "SELECT type, amount, note, created_at FROM transactions WHERE account_id=? ORDER BY id DESC LIMIT 100",
-        (a["id"],),
-    ).fetchall()
-    c.close()
-    lines = ["<ul>"]
-    for r in rows:
-        lines.append(f"<li>{r['created_at']} | {r['type']} | {r['amount']:.2f} | {r['note'] or ''}</li>")
-    lines.append("</ul>")
-    return render_template_string(BASE_HTML, title="Historial", body="".join(lines))
-
-if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
-"""
-
-    def _novel_template(self) -> str:
-        chapters = [
-            (
-                "Capitulo 1 - Neon sobre lluvia",
-                "La ciudad de Kairo-9 respiraba humo azul y anuncios con voces de empresas que conocian tus suenos antes que tu. "
-                "Lia corria entre callejones de metal, con una mochila vieja y un chip robado que podia comprarle un ano de libertad. "
-                "Cuando llego al taller de Bruno, encontro la persiana abierta y un dron clavado en la pared como advertencia. "
-                "Bruno le dijo que el chip no era dinero: era una llave para entrar al banco orbital Helix, donde guardaban perfiles de deuda de media ciudad.",
-            ),
-            (
-                "Capitulo 2 - Deudas y nombres",
-                "Lia acepto el trabajo porque su madre debia mas de lo que podia pagar en tres vidas. "
-                "El plan era simple en papel: suplantar una cuenta corporativa, crear una ventana de sesenta segundos y borrar la deuda. "
-                "En la practica, la IA de Helix detectaba latidos, patron de mirada y microtemblor de voz. "
-                "Bruno construyo una mascara neuronal y un guion de conversacion. Lia repitio cada frase toda la noche, como quien ensaya una despedida.",
-            ),
-            (
-                "Capitulo 3 - Entrada",
-                "La intrusion comenzo a las 03:11. "
-                "Lia entro al nodo de acceso oculto en una lavanderia automatica, conecto su nuca al puerto de fibra y sintio el mundo bajar de volumen. "
-                "Dentro de Helix, los datos eran pasillos de vidrio y guardianes en forma de jueces sin rostro. "
-                "Cuando la IA pregunto por la autorizacion de emergencia, Lia dijo la frase exacta. "
-                "El sistema dudo dos segundos. Fue suficiente para que Bruno abriera la compuerta de archivos de deuda.",
-            ),
-            (
-                "Capitulo 4 - Ruptura",
-                "En la carpeta de su madre habia miles de nombres, todos marcados con el mismo sello: 'recuperacion activa'. "
-                "No era un banco, era una fabrica de obediencia. "
-                "Antes de borrar su caso, Lia vio una nota de origen: su propia firma biometrica habia autorizado el prestamo anos atras. "
-                "Imposible. Ella era menor entonces. "
-                "La verdad cayo como acero: Helix fabricaba identidades para endeudar a quien quisiera controlar.",
-            ),
-            (
-                "Capitulo 5 - Contraataque",
-                "Lia rompio el plan original y subio todo a la red publica de los barrios bajos. "
-                "Bruno grito por el canal: si soltaba esos datos, Helix lanzaria una caza total. "
-                "Ella respondio con calma: 'si solo salvo a una persona, manana vuelven por todos'. "
-                "La ciudad reacciono en minutos. "
-                "Pantallas piratas proyectaron contratos falsos, firmas clonadas y listas de agentes comprados. "
-                "Helix corto energia en tres distritos, pero ya era tarde.",
-            ),
-            (
-                "Capitulo 6 - Giro y cierre",
-                "Al amanecer, la red ciudadana tomo los nodos de cobro automatico. "
-                "Las deudas ilegales quedaron anuladas por auditoria forense abierta. "
-                "Lia encontro a su madre en una terraza donde nunca habia sol, mirando por primera vez un cielo sin anuncios. "
-                "Bruno llego despues, herido pero vivo, y dejo sobre la mesa una copia del chip inicial. "
-                "Dentro habia un ultimo archivo: Helix no habia sido derrotado, solo dividido. "
-                "Ahora el banco era una infraestructura comun, vigilada por quienes antes eran clientes. "
-                "Lia sonrio sin alegria: no habian ganado una guerra, habian ganado el derecho a vigilar su propia libertad.",
-            ),
-        ]
-
-        lines = ["# Novela Corta Cyberpunk", ""]
-        for title, body in chapters:
-            lines.append(f"## {title}")
-            lines.append(body)
-            lines.append("")
-        return "\n".join(lines)
-
-    def _manual_template(self) -> str:
-        return """# Manual Tecnico de Operacion Nova (8GB)
-
-## 1. Objetivo
-Este manual define instalacion, operacion, seguridad y recuperacion para Nova en equipos limitados a 8GB RAM.
-
-## 2. Instalacion Base
-1. Crear entorno virtual: `python -m venv venv`
-2. Activar entorno: `venv\\Scripts\\activate`
-3. Instalar base: `pip install -r requirements.txt`
-4. Verificar: `python tools/smoke_test_engines.py`
-
-## 3. Perfil de Recursos
-- Objetivo de arranque: < 2s
-- Incremento RAM en reposo: < 400MB
-- Sin descargas automaticas en inicio
-
-## 4. Operacion Diaria
-1. Iniciar Nova
-2. Validar estado de motores
-3. Ejecutar tarea principal
-4. Registrar hallazgos en wiki
-5. Cerrar con verificacion rapida
-
-## 5. Troubleshooting
-- Si responde lento: revisar modelo activo y timeout.
-- Si repite respuestas genericas: validar integrador y backend local GGUF.
-- Si falla un motor: ejecutar smoke test y revisar `raw_status`.
-
-## 6. Seguridad
-- Permitir scripts solo en carpetas autorizadas.
-- Mantener lista de patrones de riesgo en SecurityShield.
-- Evitar rutas fuera del proyecto (path traversal).
-
-## 7. Backup y Rollback
-1. Respaldar `config.yaml`, `orchestrator.py`, `core/`, `engines/`.
-2. Guardar snapshot de `data/`.
-3. Revertir solo archivos afectados por incidente.
-
-## 8. Checklist de Release
-- Smoke 17/17 PASS
-- Performance PASS
-- RAM PASS
-- No-download PASS
-- Documentacion actualizada
-"""
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read()
+        except Exception as e:
+            return f"Error cargando plantilla {filename}: {e}"
 
     def _deterministic_large_fallback(self, original_request: str, engine_name: str) -> str:
         req = (original_request or "").lower()
 
         if "banco" in req or "bancaria" in req:
-            return (
-                '<artifact title="app_banco_flask" type="python">\n'
-                + self._bank_app_template()
-                + "\n</artifact>"
-            )
+            template = self._load_template("bank_app.py")
+            return f'<artifact title="app_banco_flask" type="python">\n{template}\n</artifact>'
+        
         if "novela" in req:
-            return self._novel_template()
+            return self._load_template("novel_cyberpunk.md")
+            
         if "manual" in req and "nova" in req:
-            return self._manual_template()
+            # Note: manual template was already quite clean, but for consistency we could move it too.
+            # For now, let's keep it or move it if needed. 
+            # I'll create a manual.md as well to be fully "OpenAI level" in architecture.
+            return self._load_template("manual_tecnico.md")
+            
         return ""
 
     def _mock_text(self, engine_name: str, engine_outputs: dict, original_request: str) -> str:
@@ -537,7 +201,7 @@ Este manual define instalacion, operacion, seguridad y recuperacion para Nova en
                     with open(log_path, "a", encoding="utf-8") as f:
                         ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         f.write(f"{ts} - QUALITY - Fallback activado: {meta.get('reason')}\n")
-                except:
+                except Exception:
                     pass
         return res
 
@@ -559,7 +223,13 @@ Este manual define instalacion, operacion, seguridad y recuperacion para Nova en
 
         # Build prompt
         prompt = ""
-        # ... (rest of prompt building)
+        if original_request:
+            prompt += f"SOLICITUD_USUARIO:\n{original_request.strip()}\n\n"
+
+        engine_ctx = self._build_engine_context(engine_outputs)
+        if engine_ctx:
+            prompt += f"CONTEXTO_MOTORES:\n{engine_ctx}\n\n"
+
         memory_ctx = self.dynamic_memory.build_prompt_context()
         if memory_ctx:
             prompt += f"CONTEXTO_CONVERSACIONAL:\n{memory_ctx}\n\n"
@@ -591,4 +261,3 @@ Este manual define instalacion, operacion, seguridad y recuperacion para Nova en
             return self._finalize_response(self._engine_fallback_text(engine_name, engine_outputs, original_request))
 
         return self._finalize_response(text, meta={"source": "llm_real"})
-
