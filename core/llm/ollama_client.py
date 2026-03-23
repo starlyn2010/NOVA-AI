@@ -1,4 +1,4 @@
-﻿import json
+import json
 import os
 import random
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
@@ -305,7 +305,7 @@ class OllamaClient:
         self,
         prompt: str,
         system: str = "",
-        context: List[Any] = [],
+        context: Optional[List[Any]] = None,
         model: Optional[str] = None,
         stream: bool = False,
     ) -> Dict[str, Any]:
@@ -313,6 +313,10 @@ class OllamaClient:
 
         if self.mock_mode:
             return self._generate_mock(prompt, reason="forced")
+
+        # Local backend is not safely cancellable; avoid worker timeout threads.
+        if self.backend == "llama_cpp":
+            return self._generate_local(prompt=prompt, system=system, stream=stream)
 
         timeout_budget = self.real_response_timeout_sec if self.auto_mock_on_timeout else self.request_timeout
         worker_result = self._run_with_worker_timeout(
@@ -334,7 +338,7 @@ class OllamaClient:
                     import datetime
                     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     f.write(f"{ts} - ERROR - TIMEOUT LLM ({timeout_budget}s) - Activando Mock Mode.\n")
-            except:
+            except Exception:
                 pass
                 
             if self.auto_mock_on_timeout:
