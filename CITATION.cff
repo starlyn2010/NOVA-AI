@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: "NOVA-AI — Advanced Local-First AI Agent"
+message: "If you use NOVA-AI, please cite it as below."
+type: software
+authors:
+  - family-names: "Starlyn"
+    given-names: ""
+    website: "https://github.com/starlyn2010"
+license: MIT
+repository-code: "https://github.com/starlyn2010/NOVA-AI"
+url: "https://github.com/starlyn2010/NOVA-AI"
+keywords:
+  - ai-agent
+  - intent-routing
+  - rag
+  - tf-idf
+  - gguf
+  - local-llm
+  - autonomous
+version: 2.8.0
+date-released: 2026-08-26
